@@ -1,87 +1,213 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { Alert, StyleSheet } from "react-native";
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import { ListPicker, TextField } from "@/components/molecules";
+import { Button, Host } from "@expo/ui/swift-ui";
+import { useCallback, useMemo, useState } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
+
+type LabelValue = { label: string; value: string };
+type LabelValueItem = LabelValue & { items: LabelValue[] };
+
+const jobs: LabelValue[] = [
+  { label: "TNI", value: "tni" },
+  { label: "Polisi", value: "polisi" },
+  { label: "Guru", value: "guru" },
+  { label: "Petani", value: "petani" },
+];
+
+const hobbies: LabelValueItem[] = [
+  {
+    label: "Membaca",
+    value: "membaca",
+    items: [
+      { label: "Novel", value: "Novel" },
+      { label: "Komik", value: "Komik" },
+    ],
+  },
+  {
+    label: "Game",
+    value: "game",
+    items: [
+      { label: "E-Sport", value: "esport" },
+      { label: "Sepak Bola", value: "sepak-bola" },
+    ],
+  },
+];
+
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const [job, setJob] = useState<LabelValue>();
+  const [hobby, setHobby] = useState<LabelValue>();
+  const [subHobby, setSubHobby] = useState<LabelValue>();
+  const [subHobbyLoading, setSubHobbyLoading] = useState(false);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [errorValidation, setErrorValidation] = useState<{
+    name?: string;
+    email?: string;
+    job?: string;
+    hobby?: string;
+    subHobby?: string;
+  }>({
+    name: undefined,
+    email: undefined,
+    job: undefined,
+    hobby: undefined,
+    subHobby: undefined,
+  });
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+  const subHobbies = useMemo(
+    () =>
+      hobbies.find(({ items, ...rest }) => rest.value === hobby?.value)
+        ?.items || [],
+    [hobby]
+  );
+
+  const onNameChange = useCallback(
+    (value: string) => {
+      setName(value);
+
+      if (value.length < 1) {
+        setErrorValidation((prev) => ({ name: "Nama harus diisi" }));
+        return;
+      }
+
+      if (errorValidation.name) {
+        setErrorValidation((prev) => ({ ...prev, name: undefined }));
+      }
+    },
+    [errorValidation.name]
+  );
+
+  const onEmailChange = useCallback(
+    (value: string) => {
+      setEmail(value);
+
+      if (value.length < 1) {
+        setErrorValidation((prev) => ({ email: "Email harus diisi" }));
+        return;
+      }
+
+      if (!emailRegex.test(value)) {
+        setErrorValidation((prev) => ({ email: "Format email salah" }));
+        return;
+      }
+
+      if (errorValidation.email) {
+        setErrorValidation((prev) => ({ ...prev, email: undefined }));
+      }
+    },
+    [errorValidation.email]
+  );
+
+  const isCanSubmit = useMemo(
+    () => job && hobby && subHobby && name && email && !subHobbyLoading,
+    [job, hobby, subHobby, subHobbyLoading, name, email]
+  );
+
+  const onSubmit = useCallback(() => {
+    if (isCanSubmit) {
+      return Alert.alert(
+        "Values",
+        JSON.stringify({ name, email, job, hobby, subHobby })
+      );
+    }
+
+    if (!name) {
+      setErrorValidation((prev) => ({ ...prev, name: "Nama harus diisi" }));
+    }
+
+    if (!email) {
+      setErrorValidation((prev) => ({ ...prev, email: "Email harus diisi" }));
+    }
+
+    if (!job) {
+      setErrorValidation((prev) => ({ ...prev, job: "Pekerjaan harus diisi" }));
+    }
+    if (!hobby) {
+      setErrorValidation((prev) => ({ ...prev, hobby: "Hobi harus diisi" }));
+    }
+    if (!subHobby) {
+      setErrorValidation((prev) => ({
+        ...prev,
+        subHobby: "Sub Hobi harus diisi",
+      }));
+    }
+  }, [isCanSubmit, name, email, job, hobby, subHobby]);
+
+  return (
+    <SafeAreaView
+      style={{ flex: 1, paddingHorizontal: 16, gap: 8 }}
+      edges={["top"]}
+    >
+      <TextField
+        onChange={onNameChange}
+        label="Nama"
+        placeholder="Masukan Nama"
+        value={name}
+        status={errorValidation.name ? "error" : undefined}
+        helper={errorValidation.name || undefined}
+      />
+      <TextField
+        onChange={onEmailChange}
+        label="Email"
+        placeholder="Masukan Email"
+        value={email}
+        keyboardType="email-address"
+        inputMode="email"
+        status={errorValidation.email ? "error" : undefined}
+        helper={errorValidation.email || undefined}
+      />
+      <ListPicker
+        data={jobs}
+        value={job}
+        onChange={setJob}
+        label="Pekerjaan"
+        placeholder="Pilih Pekerjaan"
+        status={errorValidation.job ? "error" : undefined}
+        helper={errorValidation.job || undefined}
+      />
+      <ListPicker
+        data={hobbies.map(({ items, ...rest }) => rest)}
+        value={hobby}
+        onChange={(value) => {
+          setSubHobbyLoading(true);
+          setHobby(value);
+          setSubHobby(undefined);
+          setTimeout(() => {
+            setSubHobbyLoading(false);
+          }, 1000);
+        }}
+        label="Hobi"
+        placeholder="Pilih Hobi"
+        status={errorValidation.hobby ? "error" : undefined}
+        helper={errorValidation.hobby || undefined}
+      />
+      <ListPicker
+        data={subHobbies}
+        value={subHobby}
+        onChange={setSubHobby}
+        label="Sub Hobi"
+        placeholder="Pilih Sub Hobi"
+        disabled={!hobby}
+        loading={subHobbyLoading}
+        status={errorValidation.subHobby ? "error" : undefined}
+        helper={errorValidation.subHobby || undefined}
+      />
+      <Host matchContents>
+        <Button variant="glass" onPress={onSubmit}>
+          Submit
+        </Button>
+      </Host>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
   },
   stepContainer: {
@@ -93,6 +219,6 @@ const styles = StyleSheet.create({
     width: 290,
     bottom: 0,
     left: 0,
-    position: 'absolute',
+    position: "absolute",
   },
 });
