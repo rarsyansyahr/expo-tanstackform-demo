@@ -1,10 +1,9 @@
-import { Alert, StyleSheet, ViewStyle } from "react-native";
+import { Alert, StyleSheet, View, ViewStyle } from "react-native";
 
 import { ListPicker, TextField } from "@/components/molecules";
 import { hobbies, jobs, LabelValue } from "@/data";
 import { Button, Host } from "@expo/ui/swift-ui";
 import { useCallback, useMemo, useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -41,12 +40,15 @@ export default function HomeScreen() {
       setName(value);
 
       if (value.length < 1) {
-        setErrorValidation((prev) => ({ name: "Nama harus diisi" }));
+        setErrorValidation((prev) => ({ ...prev, name: "Nama harus diisi" }));
         return;
       }
 
       if (value.length < 5) {
-        setErrorValidation((prev) => ({ name: "Nama minimal 5 karakter" }));
+        setErrorValidation((prev) => ({
+          ...prev,
+          name: "Nama minimal 5 karakter",
+        }));
         return;
       }
 
@@ -62,12 +64,15 @@ export default function HomeScreen() {
       setEmail(value);
 
       if (value.length < 1) {
-        setErrorValidation((prev) => ({ email: "Email harus diisi" }));
+        setErrorValidation((prev) => ({ ...prev, email: "Email harus diisi" }));
         return;
       }
 
       if (!emailRegex.test(value)) {
-        setErrorValidation((prev) => ({ email: "Format email salah" }));
+        setErrorValidation((prev) => ({
+          ...prev,
+          email: "Format email salah",
+        }));
         return;
       }
 
@@ -116,7 +121,7 @@ export default function HomeScreen() {
   }, [isCanSubmit, name, email, job, hobby, subHobby]);
 
   return (
-    <SafeAreaView style={styles.root} edges={["top"]}>
+    <View style={styles.root}>
       <TextField
         onChange={onNameChange}
         label="Nama"
@@ -176,12 +181,12 @@ export default function HomeScreen() {
           Submit
         </Button>
       </Host>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, paddingHorizontal: 16, gap: 8 } as ViewStyle,
+  root: { flex: 1, padding: 16, gap: 8 } as ViewStyle,
 
   titleContainer: {
     flexDirection: "row",
