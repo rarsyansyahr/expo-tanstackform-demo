@@ -1,6 +1,9 @@
 import { Drawer } from "expo-router/drawer";
 
-const menus = [{ name: "index", title: "Basic" }];
+const menus = [
+  { name: "index", title: "Basic" },
+  { name: "tanstackform", title: "Tanstack Form" },
+];
 
 export default function Layout() {
   return (
