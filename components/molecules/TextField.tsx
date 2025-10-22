@@ -1,10 +1,16 @@
-import React, { FC, memo, useMemo } from "react";
+import React, {
+  ForwardedRef,
+  forwardRef,
+  memo,
+  ReactNode,
+  useMemo,
+} from "react";
 import {
-    ActivityIndicator,
-    Text,
-    TextInput,
-    TextInputProps,
-    View,
+  ActivityIndicator,
+  Text,
+  TextInput,
+  TextInputProps,
+  View,
 } from "react-native";
 
 type TextFieldProps = Omit<TextInputProps, "onChange" | "onChangeText"> & {
@@ -14,6 +20,7 @@ type TextFieldProps = Omit<TextInputProps, "onChange" | "onChangeText"> & {
   loading?: boolean;
   helper?: string;
   status?: "error";
+  EndComponent?: ReactNode;
 };
 
 const statusMap = {
@@ -23,17 +30,19 @@ const statusMap = {
   },
 };
 
-const TextFieldComponent: FC<TextFieldProps> = (props) => {
-  const {
+const TextFieldComponent = (
+  {
     onChange,
     label,
     disabled = false,
     loading = false,
     helper,
     status,
+    EndComponent,
     ...rest
-  } = props;
-
+  }: TextFieldProps,
+  ref: ForwardedRef<TextInput>
+) => {
   const validationStatus = useMemo(() => {
     if (!status) {
       return {
@@ -61,17 +70,30 @@ const TextFieldComponent: FC<TextFieldProps> = (props) => {
         }}
       >
         <TextInput
-          editable={!disabled}
+          ref={ref}
+          editable={!disabled && !loading}
           onChangeText={onChange}
           style={{
+            flex: 1,
             fontSize: 16,
             color: disabled || loading ? "grey" : "black",
             paddingVertical: 6,
           }}
           {...rest}
         />
-        {loading && <ActivityIndicator size="small" />}
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "flex-end",
+            gap: 4,
+          }}
+        >
+          {loading && <ActivityIndicator size="small" />}
+          {EndComponent}
+        </View>
       </View>
+
       {helper && (
         <Text style={{ fontSize: 10, color: validationStatus.color }}>
           {helper}
@@ -83,4 +105,6 @@ const TextFieldComponent: FC<TextFieldProps> = (props) => {
 
 TextFieldComponent.displayName = "TextField";
 
-export const TextField = memo(TextFieldComponent);
+export const TextField = memo(
+  forwardRef<TextInput, TextFieldProps>(TextFieldComponent)
+);
