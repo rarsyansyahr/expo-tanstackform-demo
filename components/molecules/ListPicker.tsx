@@ -1,12 +1,20 @@
 import { BottomSheet, Button, Host, HStack, Picker } from "@expo/ui/swift-ui";
 import { padding } from "@expo/ui/swift-ui/modifiers";
-import React, { FC, memo, useMemo, useState } from "react";
+import React, {
+  forwardRef,
+  memo,
+  Ref,
+  useCallback,
+  useImperativeHandle,
+  useMemo,
+  useState
+} from "react";
 import {
-    ActivityIndicator,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 type ListPickerItem = { label: string; value: string };
@@ -23,6 +31,11 @@ type ListPickerProps = {
   status?: "error";
 };
 
+export type ListPickerRef = {
+  open: () => void;
+  close: () => void;
+};
+
 const statusMap = {
   error: {
     color: "red",
@@ -30,7 +43,10 @@ const statusMap = {
   },
 };
 
-const ListPickerComponent: FC<ListPickerProps> = (props) => {
+const ListPickerComponent = (
+  props: ListPickerProps,
+  ref: Ref<ListPickerRef>
+) => {
   const { data, onChange, value, label, placeholder, disabled = false } = props;
   const { loading = false, helper, status } = props;
 
@@ -39,7 +55,6 @@ const ListPickerComponent: FC<ListPickerProps> = (props) => {
 
   const selectedItemIndex = useMemo(() => {
     if (value) return data.indexOf(value);
-
     return selectedIndex;
   }, [data, value, selectedIndex]);
 
@@ -50,9 +65,20 @@ const ListPickerComponent: FC<ListPickerProps> = (props) => {
         borderColor: "grey",
       };
     }
-
     return statusMap[status];
   }, [status]);
+
+  // open / close callbacks
+  const openSheet = useCallback(() => {
+    setIsOpened(true);
+  }, []);
+  const closeSheet = useCallback(() => setIsOpened(false), []);
+
+  // expose methods via ref
+  useImperativeHandle(ref, () => ({
+    open: openSheet,
+    close: closeSheet,
+  }));
 
   return (
     <View>
@@ -61,7 +87,7 @@ const ListPickerComponent: FC<ListPickerProps> = (props) => {
         <TouchableOpacity
           disabled={disabled || loading}
           activeOpacity={0.8}
-          onPress={() => setIsOpened(true)}
+          onPress={openSheet}
           style={{
             borderWidth: 1,
             borderColor: validationStatus.borderColor,
@@ -89,10 +115,11 @@ const ListPickerComponent: FC<ListPickerProps> = (props) => {
           </Text>
         )}
       </View>
+
       <Host matchContents>
         <BottomSheet
           isOpened={isOpened}
-          onIsOpenedChange={(e) => setIsOpened(e)}
+          onIsOpenedChange={setIsOpened}
           presentationDragIndicator="automatic"
           presentationDetents={[0.3]}
         >
@@ -107,10 +134,7 @@ const ListPickerComponent: FC<ListPickerProps> = (props) => {
           />
           <HStack>
             <Host style={{ width: "100%" }}>
-              <Button
-                modifiers={[padding({ all: 0 })]}
-                onPress={() => setIsOpened(false)}
-              >
+              <Button modifiers={[padding({ all: 0 })]} onPress={closeSheet}>
                 Cancel
               </Button>
             </Host>
@@ -119,7 +143,7 @@ const ListPickerComponent: FC<ListPickerProps> = (props) => {
                 modifiers={[padding({ all: 0 })]}
                 onPress={() => {
                   onChange(data[selectedIndex]);
-                  setIsOpened(false);
+                  closeSheet();
                 }}
               >
                 Confirm
@@ -134,6 +158,8 @@ const ListPickerComponent: FC<ListPickerProps> = (props) => {
 
 ListPickerComponent.displayName = "List Picker";
 
-export const ListPicker = memo(ListPickerComponent);
+export const ListPicker = memo(
+  forwardRef<ListPickerRef, ListPickerProps>(ListPickerComponent)
+);
 
 const styles = StyleSheet.create({});
