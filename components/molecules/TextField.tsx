@@ -31,7 +31,10 @@ const statusMap = {
 };
 
 const TextFieldComponent = (
-  {
+  props: TextFieldProps,
+  ref: ForwardedRef<TextInput>
+) => {
+  const {
     onChange,
     label,
     disabled = false,
@@ -40,9 +43,8 @@ const TextFieldComponent = (
     status,
     EndComponent,
     ...rest
-  }: TextFieldProps,
-  ref: ForwardedRef<TextInput>
-) => {
+  } = props;
+
   const validationStatus = useMemo(() => {
     if (!status) {
       return {
