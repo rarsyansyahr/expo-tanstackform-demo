@@ -1,4 +1,4 @@
-import { ListPicker, TextField } from "@/components/molecules";
+import { ListPicker, ListPickerRef, TextField } from "@/components/molecules";
 import { hobbies, jobs, LabelValue } from "@/data";
 import { Button, Host } from "@expo/ui/swift-ui";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -46,6 +46,9 @@ const defaultValues: FormValues = {
 
 const TanstackFormScreen: FC = () => {
   const emailRef = useRef<TextInput>(null);
+  const jobPickerRef = useRef<ListPickerRef>(null);
+  const hobbyPickerRef = useRef<ListPickerRef>(null);
+  const subHobbyPickerRef = useRef<ListPickerRef>(null);
 
   const [subHobbies, setSubHobbies] = useState<LabelValue[]>([]);
   const [isSafeEmail, setIsSafeEmail] = useState(false);
@@ -74,6 +77,7 @@ const TanstackFormScreen: FC = () => {
     setSubHobbies(matched?.items ?? []);
 
     formApi.setFieldValue("subHobby", undefined);
+    subHobbyPickerRef.current?.open();
   };
 
   return (
@@ -146,6 +150,7 @@ const TanstackFormScreen: FC = () => {
             helper={errors[0]?.message}
             loading={isValidating}
             returnKeyType="next"
+            onSubmitEditing={() => jobPickerRef.current?.open()}
             EndComponent={
               isValid &&
               !isValidating &&
@@ -167,11 +172,15 @@ const TanstackFormScreen: FC = () => {
           handleChange,
         }) => (
           <ListPicker
+            ref={jobPickerRef}
             label="Pekerjaan"
             placeholder="Pilih Pekerjaan"
             data={jobs}
             value={value}
-            onChange={handleChange}
+            onChange={(value) => {
+              handleChange(value);
+              hobbyPickerRef.current?.open();
+            }}
             status={errors.length ? "error" : undefined}
             helper={errors[0]?.message}
           />
@@ -195,6 +204,7 @@ const TanstackFormScreen: FC = () => {
           handleChange,
         }) => (
           <ListPicker
+            ref={hobbyPickerRef}
             label="Hobi"
             placeholder="Pilih Hobi"
             data={hobbies}
@@ -227,6 +237,7 @@ const TanstackFormScreen: FC = () => {
               handleChange,
             }) => (
               <ListPicker
+                ref={subHobbyPickerRef}
                 label="Sub Hobi"
                 placeholder="Pilih Sub Hobi"
                 data={subHobbies}
