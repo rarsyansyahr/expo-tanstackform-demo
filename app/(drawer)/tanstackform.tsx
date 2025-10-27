@@ -1,14 +1,27 @@
-import { ListPicker, ListPickerRef, TextField } from "@/components/molecules";
+import {
+  DatePicker,
+  DatePickerRef,
+  ListPicker,
+  ListPickerRef,
+  TextField,
+} from "@/components/molecules";
 import { hobbies, jobs, LabelValue } from "@/data";
 import { Button, Host } from "@expo/ui/swift-ui";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useForm } from "@tanstack/react-form";
 import { FC, useRef, useState } from "react";
-import { Alert, StyleSheet, TextInput, View } from "react-native";
+import { Alert, Keyboard, StyleSheet, TextInput, View } from "react-native";
 import { z } from "zod";
 
 const formSchema = z.object({
   name: z.string().min(1, "Nama harus diisi").min(5, "Nama minimal 5 karakter"),
+  birthDate: z.object(
+    {
+      label: z.string(),
+      value: z.date().max(new Date(), "Tanggal Lahir harus di bawah hari ini"),
+    },
+    { error: "Tanggal Lahir harus diisi" }
+  ),
   email: z.email("Format email salah").min(1, "Email harus diisi"),
   job: z.object(
     {
@@ -39,6 +52,7 @@ type FormValues = z.infer<typeof formSchema>;
 const defaultValues: FormValues = {
   name: "",
   email: "andi@rubin.com",
+  birthDate: undefined as any,
   job: jobs[0],
   hobby: undefined as any,
   subHobby: undefined as any,
@@ -46,6 +60,7 @@ const defaultValues: FormValues = {
 
 const TanstackFormScreen: FC = () => {
   const emailRef = useRef<TextInput>(null);
+  const birthDatePickerRef = useRef<DatePickerRef>(null);
   const jobPickerRef = useRef<ListPickerRef>(null);
   const hobbyPickerRef = useRef<ListPickerRef>(null);
   const subHobbyPickerRef = useRef<ListPickerRef>(null);
@@ -62,6 +77,8 @@ const TanstackFormScreen: FC = () => {
       if (hobby && !subHobby) return form.setFieldValue("subHobby", null);
 
       Alert.alert("Values", JSON.stringify(value));
+
+      Keyboard.dismiss();
     },
   });
 
@@ -150,7 +167,7 @@ const TanstackFormScreen: FC = () => {
             helper={errors[0]?.message}
             loading={isValidating}
             returnKeyType="next"
-            onSubmitEditing={() => jobPickerRef.current?.open()}
+            onSubmitEditing={() => birthDatePickerRef.current?.open()}
             EndComponent={
               isValid &&
               !isValidating &&
@@ -158,6 +175,39 @@ const TanstackFormScreen: FC = () => {
                 <MaterialIcons name="verified" color="green" size={20} />
               )
             }
+          />
+        )}
+      </Field>
+
+      {/* Birth Date */}
+      <Field
+        name="birthDate"
+        validators={{
+          onChange: formSchema.shape.birthDate,
+        }}
+      >
+        {({
+          state: {
+            value,
+            meta: { errors },
+          },
+          handleChange,
+        }) => (
+          <DatePicker
+            ref={birthDatePickerRef}
+            label="Tanggal Lahir"
+            placeholder="Pilih Tanggal Lahir"
+            value={value}
+            onChange={(birthDate) => {
+              handleChange(birthDate);
+
+              const { success } =
+                formSchema.shape.birthDate.safeParse(birthDate);
+
+              if (success) jobPickerRef.current?.open();
+            }}
+            status={errors.length ? "error" : undefined}
+            helper={errors[0]?.message}
           />
         )}
       </Field>
@@ -177,8 +227,8 @@ const TanstackFormScreen: FC = () => {
             placeholder="Pilih Pekerjaan"
             data={jobs}
             value={value}
-            onChange={(value) => {
-              handleChange(value);
+            onChange={(job) => {
+              handleChange(job);
               hobbyPickerRef.current?.open();
             }}
             status={errors.length ? "error" : undefined}
