@@ -7,7 +7,7 @@ import React, {
   useCallback,
   useImperativeHandle,
   useMemo,
-  useState
+  useState,
 } from "react";
 import {
   ActivityIndicator,
@@ -82,21 +82,16 @@ const ListPickerComponent = (
 
   return (
     <View>
-      <View style={{ gap: 4 }}>
-        {label && <Text style={{ fontSize: 12 }}>{label}</Text>}
+      <View style={styles.textfieldContainer}>
+        {label && <Text style={styles.label}>{label}</Text>}
         <TouchableOpacity
           disabled={disabled || loading}
           activeOpacity={0.8}
           onPress={openSheet}
-          style={{
-            borderWidth: 1,
-            borderColor: validationStatus.borderColor,
-            paddingHorizontal: 8,
-            borderRadius: 4,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
+          style={[
+            styles.inputContainer,
+            { borderColor: validationStatus.borderColor },
+          ]}
         >
           <Text
             style={{
@@ -133,12 +128,12 @@ const ListPickerComponent = (
             variant="wheel"
           />
           <HStack>
-            <Host style={{ width: "100%" }}>
+            <Host style={styles.w100}>
               <Button modifiers={[padding({ all: 0 })]} onPress={closeSheet}>
                 Cancel
               </Button>
             </Host>
-            <Host style={{ width: "100%" }}>
+            <Host style={styles.w100}>
               <Button
                 modifiers={[padding({ all: 0 })]}
                 onPress={() => {
@@ -162,4 +157,19 @@ export const ListPicker = memo(
   forwardRef<ListPickerRef, ListPickerProps>(ListPickerComponent)
 );
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  textfieldContainer: { gap: 4 },
+
+  label: { fontSize: 12 },
+
+  inputContainer: {
+    borderWidth: 1,
+    paddingHorizontal: 8,
+    borderRadius: 4,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+
+  w100: { width: "100%" },
+});
