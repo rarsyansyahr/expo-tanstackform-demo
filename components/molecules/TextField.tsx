@@ -7,13 +7,18 @@ import React, {
 } from "react";
 import {
   ActivityIndicator,
+  StyleProp,
   Text,
   TextInput,
   TextInputProps,
   View,
+  ViewStyle,
 } from "react-native";
 
-type TextFieldProps = Omit<TextInputProps, "onChange" | "onChangeText"> & {
+export type TextFieldProps = Omit<
+  TextInputProps,
+  "onChange" | "onChangeText" | "style"
+> & {
   onChange: (value: string) => void;
   label?: string;
   disabled?: boolean;
@@ -21,6 +26,7 @@ type TextFieldProps = Omit<TextInputProps, "onChange" | "onChangeText"> & {
   helper?: string;
   status?: "error";
   EndComponent?: ReactNode;
+  style?: StyleProp<ViewStyle>;
 };
 
 const statusMap = {
@@ -42,6 +48,7 @@ const TextFieldComponent = (
     helper,
     status,
     EndComponent,
+    style,
     ...rest
   } = props;
 
@@ -57,7 +64,7 @@ const TextFieldComponent = (
   }, [status]);
 
   return (
-    <View style={{ gap: 4 }}>
+    <View style={[{ gap: 4 }, style]}>
       {label && <Text style={{ fontSize: 12 }}>{label}</Text>}
 
       <View
