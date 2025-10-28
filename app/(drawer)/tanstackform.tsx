@@ -31,54 +31,48 @@ const educationItemSchema = z.object({
   yearRange: z.string().min(5, "Tahun Pendidikan harus diisi"),
 });
 
-const formSchema = z
-  .object({
-    name: z
-      .string()
-      .min(1, "Nama harus diisi")
-      .min(5, "Nama minimal 5 karakter"),
-    birthDate: z.object(
-      {
-        label: z.string(),
-        value: z
-          .date()
-          .max(new Date(), "Tanggal Lahir harus di bawah hari ini"),
-      },
-      { error: "Tanggal Lahir harus diisi" }
-    ),
-    email: z.email("Format email salah").min(1, "Email harus diisi"),
-    gender: z.enum(["male", "female"], "Jenis Kelamin harus diisi"),
-    educations: z
-      .array(educationItemSchema)
-      .min(1, "Riwayat Pendidikan harus diisi"),
-    job: z.object(
+const formSchema = z.object({
+  name: z.string().min(1, "Nama harus diisi").min(5, "Nama minimal 5 karakter"),
+  birthDate: z.object(
+    {
+      label: z.string(),
+      value: z.date().max(new Date(), "Tanggal Lahir harus di bawah hari ini"),
+    },
+    { error: "Tanggal Lahir harus diisi" }
+  ),
+  email: z.email("Format email salah").min(1, "Email harus diisi"),
+  gender: z.enum(["male", "female"], "Jenis Kelamin harus diisi"),
+  educations: z
+    .array(educationItemSchema)
+    .min(1, "Riwayat Pendidikan harus diisi"),
+  job: z.object(
+    {
+      label: z.string(),
+      value: z.string(),
+    },
+    { error: "Pekerjaan harus diisi" }
+  ),
+  hobby: z
+    .object({
+      label: z.string(),
+      value: z.string(),
+    })
+    .optional(),
+  subHobby: z
+    .object(
       {
         label: z.string(),
         value: z.string(),
       },
-      { error: "Pekerjaan harus diisi" }
-    ),
-    hobby: z
-      .object({
-        label: z.string(),
-        value: z.string(),
-      })
-      .optional(),
-    subHobby: z
-      .object(
-        {
-          label: z.string(),
-          value: z.string(),
-        },
-        { error: "Sub Hobi harus diisi" }
-      )
-      .optional(),
-  })
-  // .refine((values) => {
-  //   if (values.hobby && !values.subHobby) {
-  //     val
-  //   }
-  // });
+      { error: "Sub Hobi harus diisi" }
+    )
+    .optional(),
+});
+// .refine((values) => {
+//   if (values.hobby && !values.subHobby) {
+//     val
+//   }
+// });
 
 type FormValues = z.infer<typeof formSchema>;
 
@@ -114,6 +108,13 @@ const TanstackFormScreen: FC = () => {
   // @ts-ignore
   const form = useForm<FormValues>({
     defaultValues,
+    onSubmitInvalid: ({ value, formApi }) => {
+      const { hobby, subHobby } = value;
+
+      formApi.validateAllFields("blur")
+
+      if (hobby && !subHobby) return form.setFieldValue("subHobby", null);
+    },
     onSubmit: async ({ value }) => {
       const { hobby, subHobby } = value;
 
