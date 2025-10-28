@@ -118,7 +118,7 @@ const DatePickerComponent = (
           isOpened={isOpened}
           onIsOpenedChange={setIsOpened}
           presentationDragIndicator="automatic"
-          presentationDetents={[0.35]}
+          presentationDetents={[0.6]}
         >
           <DateTimePicker
             onDateSelected={setSelectedDate}
@@ -128,7 +128,7 @@ const DatePickerComponent = (
                 ? new Date(value.value).toISOString()
                 : initialDate.toISOString()
             }
-            variant="wheel"
+            variant="graphical"
           />
           <HStack>
             <Host style={styles.w100}>
@@ -140,8 +140,6 @@ const DatePickerComponent = (
               <Button
                 modifiers={[padding({ all: 0 })]}
                 onPress={() => {
-                  console.info({ selectedDate });
-
                   if (selectedDate) {
                     onChange({
                       label: dayjs(selectedDate).format("DD MMMM YYYY"),
