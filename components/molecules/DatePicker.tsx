@@ -130,7 +130,7 @@ const DatePickerComponent = (
           <HStack>
             <Host style={styles.w100}>
               <Button modifiers={[padding({ all: 0 })]} onPress={closeSheet}>
-                Cancel
+                Batal
               </Button>
             </Host>
             <Host style={styles.w100}>
@@ -146,7 +146,7 @@ const DatePickerComponent = (
                   closeSheet();
                 }}
               >
-                Confirm
+                Konfirmasi
               </Button>
             </Host>
           </HStack>
