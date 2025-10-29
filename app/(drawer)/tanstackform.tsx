@@ -1,3 +1,4 @@
+import { Button } from "@/components/atoms";
 import {
   DatePicker,
   DatePickerRef,
@@ -12,7 +13,6 @@ import { useForm } from "@tanstack/react-form";
 import { FC, useRef, useState } from "react";
 import {
   Alert,
-  Button,
   FlatList,
   Keyboard,
   ScrollView,
@@ -111,7 +111,7 @@ const TanstackFormScreen: FC = () => {
     onSubmitInvalid: ({ value, formApi }) => {
       const { hobby, subHobby } = value;
 
-      formApi.validateAllFields("blur")
+      formApi.validateAllFields("blur");
 
       if (hobby && !subHobby) return form.setFieldValue("subHobby", null);
     },
@@ -163,7 +163,30 @@ const TanstackFormScreen: FC = () => {
             status={errors.length ? "error" : undefined}
             helper={errors[0]?.message}
             returnKeyType="next"
-            onSubmitEditing={() => emailRef.current?.focus()}
+            // onSubmitEditing={() => emailRef.current?.focus()}
+          />
+        )}
+      </Field>
+
+      {/* Gender */}
+      <Field name="gender" validators={{ onChange: formSchema.shape.gender }}>
+        {({
+          state: {
+            value,
+            meta: { errors },
+          },
+          handleChange,
+        }) => (
+          <RadioGroup
+            label="Jenis Kelamin"
+            data={[
+              { label: "Laki-laki", value: "male" },
+              { label: "Perempuan", value: "female" },
+            ]}
+            onChange={handleChange}
+            value={value}
+            status={errors.length ? "error" : undefined}
+            helper={errors[0]?.message}
           />
         )}
       </Field>
@@ -175,7 +198,7 @@ const TanstackFormScreen: FC = () => {
           onChange: formSchema.shape.email,
           onBlurAsync: async ({ value, fieldApi }) => {
             const formApi = fieldApi.form;
-            if (!value || formApi.state.isSubmitting) return;
+            if (!value || (formApi.state.isSubmitting && !isSafeEmail)) return;
 
             await new Promise((r) => setTimeout(r, 1500));
 
@@ -212,39 +235,15 @@ const TanstackFormScreen: FC = () => {
             onBlur={handleBlur}
             status={errors.length ? "error" : undefined}
             helper={errors[0]?.message}
-            loading={isValidating}
+            loading={isValidating && !isSafeEmail}
             returnKeyType="next"
             onSubmitEditing={() => birthDatePickerRef.current?.open()}
             EndComponent={
               isValid &&
-              !isValidating &&
               isSafeEmail && (
                 <MaterialIcons name="verified" color="green" size={20} />
               )
             }
-          />
-        )}
-      </Field>
-
-      {/* Gender */}
-      <Field name="gender" validators={{ onChange: formSchema.shape.gender }}>
-        {({
-          state: {
-            value,
-            meta: { errors },
-          },
-          handleChange,
-        }) => (
-          <RadioGroup
-            label="Jenis Kelamin"
-            data={[
-              { label: "Laki-laki", value: "male" },
-              { label: "Perempuan", value: "female" },
-            ]}
-            onChange={handleChange}
-            value={value}
-            status={errors.length ? "error" : undefined}
-            helper={errors[0]?.message}
           />
         )}
       </Field>
@@ -281,6 +280,97 @@ const TanstackFormScreen: FC = () => {
           />
         )}
       </Field>
+
+      {/* Job */}
+      <Field name="job" validators={{ onChange: formSchema.shape.job }}>
+        {({
+          state: {
+            value,
+            meta: { errors },
+          },
+          handleChange,
+        }) => (
+          <ListPicker
+            ref={jobPickerRef}
+            label="Pekerjaan"
+            placeholder="Pilih Pekerjaan"
+            data={jobs}
+            value={value}
+            onChange={(job) => {
+              handleChange(job);
+              hobbyPickerRef.current?.open();
+            }}
+            status={errors.length ? "error" : undefined}
+            helper={errors[0]?.message}
+          />
+        )}
+      </Field>
+
+      {/* Hobby */}
+      <Field
+        name="hobby"
+        validators={{
+          onChange: formSchema.shape.hobby,
+          onChangeAsyncDebounceMs: 100,
+          onChangeAsync: onHobbyChange,
+        }}
+      >
+        {({
+          state: {
+            value,
+            meta: { errors },
+          },
+          handleChange,
+        }) => (
+          <ListPicker
+            ref={hobbyPickerRef}
+            label="Hobi"
+            placeholder="Pilih Hobi"
+            data={hobbies}
+            value={value}
+            onChange={handleChange}
+            status={errors.length ? "error" : undefined}
+            helper={errors[0]?.message}
+          />
+        )}
+      </Field>
+
+      {/* Sub Hobby */}
+      <Subscribe
+        selector={(state) => [
+          state.fieldMeta.hobby?.isValidating,
+          state.values.hobby,
+          state.isSubmitting,
+        ]}
+      >
+        {([isValidating, hobby, isSubmitting]) => (
+          <Field
+            name="subHobby"
+            validators={{ onChange: formSchema.shape.subHobby }}
+          >
+            {({
+              state: {
+                value,
+                meta: { errors },
+              },
+              handleChange,
+            }) => (
+              <ListPicker
+                ref={subHobbyPickerRef}
+                label="Sub Hobi"
+                placeholder="Pilih Sub Hobi"
+                data={subHobbies}
+                value={value}
+                onChange={handleChange}
+                loading={isValidating && !isSubmitting}
+                status={errors.length ? "error" : undefined}
+                helper={errors[0]?.message}
+                disabled={!hobby}
+              />
+            )}
+          </Field>
+        )}
+      </Subscribe>
 
       {/* Educations */}
       <Field
@@ -411,110 +501,32 @@ const TanstackFormScreen: FC = () => {
               />
             )}
             ListHeaderComponent={<Text>Riwayat Pendidikan</Text>}
+            ListFooterComponentStyle={{
+              justifyContent: "flex-end",
+              alignItems: "flex-end",
+            }}
             ListFooterComponent={
               <Button
                 onPress={() =>
                   field.pushValue({ school: "", degree: "", yearRange: "" })
                 }
                 title="Tambah Pendidikan"
+                preset="text"
               />
             }
           />
         )}
       </Field>
 
-      {/* Job */}
-      <Field name="job" validators={{ onChange: formSchema.shape.job }}>
-        {({
-          state: {
-            value,
-            meta: { errors },
-          },
-          handleChange,
-        }) => (
-          <ListPicker
-            ref={jobPickerRef}
-            label="Pekerjaan"
-            placeholder="Pilih Pekerjaan"
-            data={jobs}
-            value={value}
-            onChange={(job) => {
-              handleChange(job);
-              hobbyPickerRef.current?.open();
-            }}
-            status={errors.length ? "error" : undefined}
-            helper={errors[0]?.message}
-          />
-        )}
-      </Field>
-
-      {/* Hobby */}
-      <Field
-        name="hobby"
-        validators={{
-          onChange: formSchema.shape.hobby,
-          onChangeAsyncDebounceMs: 100,
-          onChangeAsync: onHobbyChange,
-        }}
-      >
-        {({
-          state: {
-            value,
-            meta: { errors },
-          },
-          handleChange,
-        }) => (
-          <ListPicker
-            ref={hobbyPickerRef}
-            label="Hobi"
-            placeholder="Pilih Hobi"
-            data={hobbies}
-            value={value}
-            onChange={handleChange}
-            status={errors.length ? "error" : undefined}
-            helper={errors[0]?.message}
-          />
-        )}
-      </Field>
-
-      {/* Sub Hobby */}
-      <Subscribe
-        selector={(state) => [
-          state.fieldMeta.hobby?.isValidating,
-          state.values.hobby,
-          state.isSubmitting,
-        ]}
-      >
-        {([isValidating, hobby, isSubmitting]) => (
-          <Field
-            name="subHobby"
-            validators={{ onChange: formSchema.shape.subHobby }}
-          >
-            {({
-              state: {
-                value,
-                meta: { errors },
-              },
-              handleChange,
-            }) => (
-              <ListPicker
-                ref={subHobbyPickerRef}
-                label="Sub Hobi"
-                placeholder="Pilih Sub Hobi"
-                data={subHobbies}
-                value={value}
-                onChange={handleChange}
-                loading={isValidating && !isSubmitting}
-                status={errors.length ? "error" : undefined}
-                helper={errors[0]?.message}
-                disabled={!hobby}
-              />
-            )}
-          </Field>
-        )}
-      </Subscribe>
-
       <Button onPress={form.handleSubmit} title="Submit" />
+      <Button
+        onPress={() => {
+          setIsSafeEmail(false);
+          form.reset(defaultValues);
+        }}
+        preset="text"
+        title="Reset"
+      />
     </ScrollView>
   );
 };
@@ -526,6 +538,6 @@ export default TanstackFormScreen;
 const styles = StyleSheet.create({
   root: {
     padding: 16,
-    gap: 12,
+    gap: 16,
   },
 });
