@@ -8,12 +8,12 @@ import React, {
 import {
   ActivityIndicator,
   StyleProp,
-  Text,
   TextInput,
   TextInputProps,
   View,
   ViewStyle,
 } from "react-native";
+import { Text } from "../atoms";
 
 export type TextFieldProps = Omit<
   TextInputProps,
@@ -55,8 +55,8 @@ const TextFieldComponent = (
   const validationStatus = useMemo(() => {
     if (!status) {
       return {
-        color: "black",
-        borderColor: "grey",
+        color: "#0C2B4E",
+        borderColor: "#1A3D64",
       };
     }
 
@@ -65,7 +65,7 @@ const TextFieldComponent = (
 
   return (
     <View style={[{ gap: 4 }, style]}>
-      {label && <Text style={{ fontSize: 12 }}>{label}</Text>}
+      {label && <Text text={label} />}
 
       <View
         style={{
@@ -85,8 +85,8 @@ const TextFieldComponent = (
           style={{
             flex: 1,
             fontSize: 16,
-            color: disabled || loading ? "grey" : "black",
             paddingVertical: 6,
+            ...(disabled && { color: "grey" }),
           }}
           {...rest}
         />
@@ -104,9 +104,7 @@ const TextFieldComponent = (
       </View>
 
       {helper && (
-        <Text style={{ fontSize: 10, color: validationStatus.color }}>
-          {helper}
-        </Text>
+        <Text size={10} color={validationStatus.color} text={helper} />
       )}
     </View>
   );

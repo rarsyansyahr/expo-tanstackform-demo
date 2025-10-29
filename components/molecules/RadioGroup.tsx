@@ -1,6 +1,6 @@
 import { memo, useMemo } from "react";
-import { FlatList, ListRenderItem, StyleSheet, Text, View } from "react-native";
-import { Radio } from "../atoms";
+import { FlatList, ListRenderItem, StyleSheet, View } from "react-native";
+import { Radio, Text } from "../atoms";
 import { TextFieldProps } from "./TextField";
 
 type RadioGroupItem<T> = { label: string; value: T };
@@ -20,7 +20,15 @@ const statusMap = {
 };
 
 const RadioGroupComponent = <T,>(props: RadioGroupProps<T>) => {
-  const { data, label, helper, status, disabled = false, onChange, value } = props;
+  const {
+    data,
+    label,
+    helper,
+    status,
+    disabled = false,
+    onChange,
+    value,
+  } = props;
 
   const renderItem: ListRenderItem<RadioGroupItem<T>> = ({ index, item }) => {
     const selected = item.value === value;
@@ -48,7 +56,7 @@ const RadioGroupComponent = <T,>(props: RadioGroupProps<T>) => {
 
   return (
     <View style={{ gap: 4 }}>
-      {label && <Text style={{ fontSize: 12 }}>{label}</Text>}
+      {label && <Text text={label} />}
       <FlatList
         data={data}
         extraData={data}
@@ -61,9 +69,7 @@ const RadioGroupComponent = <T,>(props: RadioGroupProps<T>) => {
         scrollEnabled={false}
       />
       {helper && (
-        <Text style={{ fontSize: 10, color: validationStatus.color }}>
-          {helper}
-        </Text>
+        <Text size={10} color={validationStatus.color} text={helper} />
       )}
     </View>
   );

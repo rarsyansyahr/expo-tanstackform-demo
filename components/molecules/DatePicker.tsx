@@ -19,10 +19,10 @@ import React, {
 import {
   ActivityIndicator,
   StyleSheet,
-  Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import { Text } from "../atoms";
 
 type DatePickerItem = { label: string; value: Date };
 
@@ -63,8 +63,8 @@ const DatePickerComponent = (
   const validationStatus = useMemo(() => {
     if (!status) {
       return {
-        color: "black",
-        borderColor: "grey",
+        color: "#0C2B4E",
+        borderColor: "#1A3D64",
       };
     }
     return statusMap[status];
@@ -85,7 +85,7 @@ const DatePickerComponent = (
   return (
     <View>
       <View style={styles.textfieldContainer}>
-        {label && <Text style={styles.label}>{label}</Text>}
+        {label && <Text text={label} />}
         <TouchableOpacity
           disabled={disabled || loading}
           activeOpacity={0.8}
@@ -98,18 +98,15 @@ const DatePickerComponent = (
           <Text
             style={{
               fontSize: 16,
-              color: disabled || loading ? "grey" : "black",
               paddingVertical: 6,
+              ...(disabled && { color: "grey" }),
             }}
-          >
-            {value?.label || placeholder}
-          </Text>
+            text={value?.label || placeholder}
+          />
           {loading && <ActivityIndicator size="small" />}
         </TouchableOpacity>
         {helper && (
-          <Text style={{ fontSize: 10, color: validationStatus.color }}>
-            {helper}
-          </Text>
+          <Text size={10} text={helper} color={validationStatus.color} />
         )}
       </View>
 
