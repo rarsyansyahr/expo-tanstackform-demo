@@ -516,7 +516,7 @@ const TanstackFormScreen: FC = () => {
       <Subscribe selector={(state) => [state.values]}>
         {([values]) => {
           const isHaveValues = Object.values(values).some((val) => {
-            if (Array.isArray(val)) return val.length;
+            if (Array.isArray(val)) return val.length > 1;
 
             if (typeof val === "object" && !(val instanceof Date)) {
               return Object.values(val).some((sub) => !!sub);
