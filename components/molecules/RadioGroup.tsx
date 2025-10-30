@@ -1,4 +1,4 @@
-import { memo, useMemo } from "react";
+import { useMemo } from "react";
 import { FlatList, ListRenderItem, StyleSheet, View } from "react-native";
 import { Radio, Text } from "../atoms";
 import { TextFieldProps } from "./TextField";
@@ -77,7 +77,7 @@ const RadioGroupComponent = <T,>(props: RadioGroupProps<T>) => {
 
 RadioGroupComponent.displayName = "Radio Group";
 
-export const RadioGroup = memo(RadioGroupComponent);
+export const RadioGroup = RadioGroupComponent;
 
 const styles = StyleSheet.create({
   list: { alignItems: "center", gap: 8 },

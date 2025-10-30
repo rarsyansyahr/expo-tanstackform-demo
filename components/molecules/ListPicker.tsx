@@ -5,6 +5,7 @@ import React, {
   memo,
   Ref,
   useCallback,
+  useEffect,
   useImperativeHandle,
   useMemo,
   useState,
@@ -80,6 +81,13 @@ const ListPickerComponent = (
     close: closeSheet,
   }));
 
+  useEffect(() => {
+    return () => {
+      setSelectedIndex(0);
+      setIsOpened(false);
+    };
+  }, []);
+
   return (
     <View>
       <View style={styles.textfieldContainer}>
@@ -94,11 +102,12 @@ const ListPickerComponent = (
           ]}
         >
           <Text
-            style={{
-              fontSize: 16,
-              paddingVertical: 6,
-              ...(disabled && { color: "grey" }),
-            }}
+            style={[
+              styles.value,
+              disabled && {
+                color: "grey",
+              },
+            ]}
             text={value?.label || placeholder}
           />
           {loading && <ActivityIndicator size="small" />}
@@ -158,6 +167,8 @@ const styles = StyleSheet.create({
   textfieldContainer: { gap: 4 },
 
   label: { fontSize: 12 },
+
+  value: { fontSize: 16, paddingVertical: 6 },
 
   inputContainer: {
     borderWidth: 1,

@@ -1,5 +1,4 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { memo } from "react";
 import { StyleSheet, TouchableOpacity } from "react-native";
 import { Text } from "./Text";
 
@@ -24,6 +23,7 @@ const RadioComponent = <T,>(props: RadioProps<T>) => {
       <MaterialIcons
         name={selected ? "radio-button-checked" : "radio-button-unchecked"}
         size={20}
+        color="#0C2B4E"
       />
       <Text text={label} size={14} />
     </TouchableOpacity>
@@ -32,7 +32,7 @@ const RadioComponent = <T,>(props: RadioProps<T>) => {
 
 RadioComponent.displayName = "Radio";
 
-export const Radio = memo(RadioComponent);
+export const Radio = RadioComponent
 
 const styles = StyleSheet.create({
   container: { flexDirection: "row", alignItems: "center", gap: 3 },

@@ -53,8 +53,8 @@ export const Button = memo(ButtonComponent);
 const styles = StyleSheet.create({
   root: {
     paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 12,
+    paddingVertical: 10,
+    borderRadius: 14,
     justifyContent: "center",
     alignItems: "center",
   },

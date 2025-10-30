@@ -12,6 +12,7 @@ import React, {
   memo,
   Ref,
   useCallback,
+  useEffect,
   useImperativeHandle,
   useMemo,
   useState,
@@ -24,12 +25,10 @@ import {
 } from "react-native";
 import { Text } from "../atoms";
 
-type DatePickerItem = { label: string; value: Date };
-
 type DatePickerProps = {
-  value?: DatePickerItem;
+  value?: Date;
   initialDate?: Date;
-  onChange: (value: DatePickerItem) => void;
+  onChange: (value: Date) => void;
   label?: string;
   placeholder?: string;
   disabled?: boolean;
@@ -70,17 +69,35 @@ const DatePickerComponent = (
     return statusMap[status];
   }, [status]);
 
+  const dateValue = useMemo(
+    () => (value ? new Date(value).toISOString() : initialDate.toISOString()),
+    [value, initialDate]
+  );
+
   // open / close callbacks
   const openSheet = useCallback(() => {
     setIsOpened(true);
   }, []);
+
   const closeSheet = useCallback(() => setIsOpened(false), []);
+
+  const onConfirm = useCallback(() => {
+    if (selectedDate) onChange(selectedDate);
+    closeSheet();
+  }, [selectedDate, onChange, closeSheet]);
 
   // expose methods via ref
   useImperativeHandle(ref, () => ({
     open: openSheet,
     close: closeSheet,
   }));
+
+  useEffect(() => {
+    return () => {
+      setSelectedDate(undefined);
+      if (isOpened) setIsOpened(false);
+    };
+  }, []);
 
   return (
     <View>
@@ -101,7 +118,7 @@ const DatePickerComponent = (
               paddingVertical: 6,
               ...(disabled && { color: "grey" }),
             }}
-            text={value?.label || placeholder}
+            text={value ? dayjs(value).format("DD MMMM YYYY") : placeholder}
           />
           {loading && <ActivityIndicator size="small" />}
         </TouchableOpacity>
@@ -120,11 +137,7 @@ const DatePickerComponent = (
           <DateTimePicker
             onDateSelected={setSelectedDate}
             displayedComponents="date"
-            initialDate={
-              value?.value
-                ? new Date(value.value).toISOString()
-                : initialDate.toISOString()
-            }
+            initialDate={dateValue}
             variant="graphical"
           />
           <HStack>
@@ -134,18 +147,7 @@ const DatePickerComponent = (
               </Button>
             </Host>
             <Host style={styles.w100}>
-              <Button
-                modifiers={[padding({ all: 0 })]}
-                onPress={() => {
-                  if (selectedDate) {
-                    onChange({
-                      label: dayjs(selectedDate).format("DD MMMM YYYY"),
-                      value: selectedDate,
-                    });
-                  }
-                  closeSheet();
-                }}
-              >
+              <Button modifiers={[padding({ all: 0 })]} onPress={onConfirm}>
                 Konfirmasi
               </Button>
             </Host>
