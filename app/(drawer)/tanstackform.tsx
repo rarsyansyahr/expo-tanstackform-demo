@@ -3,14 +3,11 @@ import {
   DatePicker,
   ListPicker,
   RadioGroup,
-  TextField
+  TextField,
 } from "@/components/molecules";
-import { genders, hobbies, jobs } from "@/data";
-import { useTanstackForm } from "@/hooks";
-import {
-  educationItemSchema,
-  tanstackFormSchema
-} from "@/schemas";
+import { genders, hobbies, jobs, tanstackFormDefaultValues } from "@/data";
+import { checkHaveValues, useTanstackForm } from "@/hooks";
+import { educationItemSchema, tanstackFormSchema } from "@/schemas";
 import { Gender } from "@/types";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { FC } from "react";
@@ -20,7 +17,7 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -30,9 +27,9 @@ const TanstackFormScreen: FC = () => {
   const tanstackFormHook = useTanstackForm();
   const { emailRef, birthDatePickerRef, jobPickerRef } = tanstackFormHook;
   const { hobbyPickerRef, subHobbyPickerRef, form } = tanstackFormHook;
-  const { subHobbies, isSafeEmail, defaultValues } = tanstackFormHook;
+  const { subHobbies, isSafeEmail } = tanstackFormHook;
   const { setIsSafeEmail, onHobbyChange, onReset } = tanstackFormHook;
-  const { onEmailBlur, onBirthDateChange, checkHaveValues } = tanstackFormHook;
+  const { onEmailBlur, onBirthDateChange } = tanstackFormHook;
 
   const { Field, Subscribe } = form;
 
@@ -377,7 +374,9 @@ const TanstackFormScreen: FC = () => {
               ListFooterComponent={
                 <View>
                   <Button
-                    onPress={() => field.pushValue(defaultValues.educations[0])}
+                    onPress={() =>
+                      field.pushValue(tanstackFormDefaultValues.educations[0])
+                    }
                     title="Tambah Pendidikan"
                     preset="text"
                   />
