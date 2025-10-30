@@ -34,11 +34,12 @@ export const useTanstackForm = () => {
 
       formApi.validateAllFields("blur");
 
+      // @ts-ignore
       if (hobby && !subHobby) return form.setFieldValue("subHobby", null);
     },
     onSubmit: async ({ value }) => {
       const { hobby, subHobby } = value;
-
+      // @ts-ignore
       if (hobby && !subHobby) return form.setFieldValue("subHobby", null);
 
       Alert.alert("Values", JSON.stringify(value));
@@ -47,6 +48,7 @@ export const useTanstackForm = () => {
     },
   });
 
+  // @ts-ignore
   const onHobbyChange = async ({ fieldApi, value }) => {
     const formApi = fieldApi.form;
     if (formApi.state.isSubmitting) return;
@@ -66,6 +68,7 @@ export const useTanstackForm = () => {
     if (success) jobPickerRef.current?.open();
   };
 
+  // @ts-ignore
   const onEmailBlur = async ({ value, fieldApi }) => {
     const formApi = fieldApi.form;
     if (
