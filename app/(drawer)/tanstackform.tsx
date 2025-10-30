@@ -24,6 +24,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 const TanstackFormScreen: FC = () => {
   const insets = useSafeAreaInsets();
 
+  const $rootStyle = [styles.root, { paddingBottom: insets.bottom }];
+
   const tanstackFormHook = useTanstackForm();
   const { emailRef, birthDatePickerRef, jobPickerRef } = tanstackFormHook;
   const { hobbyPickerRef, subHobbyPickerRef, form } = tanstackFormHook;
@@ -36,7 +38,7 @@ const TanstackFormScreen: FC = () => {
   return (
     <KeyboardAvoidingView style={styles.flex} behavior="padding">
       <ScrollView
-        contentContainerStyle={[styles.root, { paddingBottom: insets.bottom }]}
+        contentContainerStyle={$rootStyle}
         showsVerticalScrollIndicator={false}
       >
         {/* Name */}
