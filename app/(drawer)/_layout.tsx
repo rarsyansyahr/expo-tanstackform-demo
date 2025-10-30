@@ -3,6 +3,7 @@ import { Drawer } from "expo-router/drawer";
 const menus = [
   { name: "index", title: "Basic" },
   { name: "tanstackform", title: "Tanstack Form" },
+  { name: "formcomposition", title: "Form Composition" },
 ];
 
 export default function Layout() {
