@@ -6,7 +6,7 @@ import {
 } from "react-native";
 import { Text } from "./Text";
 
-type ButtonProps = Omit<TouchableOpacityProps, "children"> & {
+export type ButtonProps = Omit<TouchableOpacityProps, "children"> & {
   title: string;
   preset?: "primary" | "text";
 };

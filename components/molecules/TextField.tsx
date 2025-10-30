@@ -19,7 +19,7 @@ export type TextFieldProps = Omit<
   TextInputProps,
   "onChange" | "onChangeText" | "style"
 > & {
-  onChange: (value: string) => void;
+  onChange?: (value: string) => void;
   label?: string;
   disabled?: boolean;
   loading?: boolean;

@@ -25,10 +25,10 @@ import {
 } from "react-native";
 import { Text } from "../atoms";
 
-type DatePickerProps = {
+export type DatePickerProps = {
   value?: Date;
   initialDate?: Date;
-  onChange: (value: Date) => void;
+  onChange?: (value: Date) => void;
   label?: string;
   placeholder?: string;
   disabled?: boolean;
@@ -82,7 +82,7 @@ const DatePickerComponent = (
   const closeSheet = useCallback(() => setIsOpened(false), []);
 
   const onConfirm = useCallback(() => {
-    if (selectedDate) onChange(selectedDate);
+    if (selectedDate && onChange) onChange(selectedDate);
     closeSheet();
   }, [selectedDate, onChange, closeSheet]);
 

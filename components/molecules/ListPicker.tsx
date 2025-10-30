@@ -18,12 +18,12 @@ import {
 } from "react-native";
 import { Text } from "../atoms";
 
-type ListPickerItem = { label: string; value: string };
+export type ListPickerItem = { label: string; value: string };
 
-type ListPickerProps = {
+export type ListPickerProps = {
   data: ListPickerItem[];
   value?: ListPickerItem;
-  onChange: (value: ListPickerItem) => void;
+  onChange?: (value: ListPickerItem) => void;
   label?: string;
   placeholder?: string;
   disabled?: boolean;
@@ -143,7 +143,7 @@ const ListPickerComponent = (
               <Button
                 modifiers={[padding({ all: 0 })]}
                 onPress={() => {
-                  onChange(data[selectedIndex]);
+                  if (onChange) onChange(data[selectedIndex]);
                   closeSheet();
                 }}
               >

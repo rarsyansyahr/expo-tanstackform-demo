@@ -5,11 +5,11 @@ import { TextFieldProps } from "./TextField";
 
 type RadioGroupItem<T> = { label: string; value: T };
 
-type RadioGroupProps<T> = {
+export type RadioGroupProps<T> = {
   data: RadioGroupItem<T>[];
   value?: T;
   disabled?: boolean;
-  onChange: (value: T) => void;
+  onChange?: (value: T) => void;
 } & Pick<TextFieldProps, "label" | "helper" | "status">;
 
 const statusMap = {
@@ -38,7 +38,7 @@ const RadioGroupComponent = <T,>(props: RadioGroupProps<T>) => {
         {...item}
         selected={selected}
         disabled={disabled}
-        onPress={() => onChange(item.value)}
+        onPress={() => (onChange ? onChange(item.value) : undefined)}
       />
     );
   };
