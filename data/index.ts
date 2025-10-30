@@ -1,3 +1,12 @@
+import {
+  EducationFormValues,
+  JobFormValues,
+  OtherFormValues,
+  PersonalFormValues,
+  TanstackFormValues,
+} from "@/schemas";
+import { Gender } from "@/types";
+
 export type LabelValue = { label: string; value: string };
 
 type LabelValueItem = LabelValue & { items: LabelValue[] };
@@ -28,7 +37,40 @@ export const hobbies: LabelValueItem[] = [
   },
 ];
 
-export const genders: { label: string; value: "male" | "female" }[] = [
+export const genders: { label: string; value: Gender }[] = [
   { label: "Laki-laki", value: "male" },
   { label: "Perempuan", value: "female" },
 ];
+
+export const personalDefaultValues: PersonalFormValues = {
+  name: undefined as any,
+  email: undefined as any,
+  gender: undefined as any,
+  birthDate: undefined as any,
+};
+
+export const jobDefaultValues: JobFormValues = {
+  job: undefined as any,
+};
+
+export const otherDefaultValues: OtherFormValues = {
+  hobby: undefined as any,
+  subHobby: undefined as any,
+};
+
+export const educationDefaultValues: EducationFormValues = {
+  educations: [
+    {
+      school: undefined as any,
+      degree: undefined as any,
+      yearRange: undefined as any,
+    },
+  ],
+};
+
+export const tanstackFormDefaultValues: TanstackFormValues = {
+  ...personalDefaultValues,
+  ...jobDefaultValues,
+  ...otherDefaultValues,
+  ...educationDefaultValues,
+};
