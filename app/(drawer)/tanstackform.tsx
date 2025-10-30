@@ -1,4 +1,4 @@
-import { Button } from "@/components/atoms";
+import { Button, Text } from "@/components/atoms";
 import {
   DatePicker,
   DatePickerRef,
@@ -7,7 +7,7 @@ import {
   RadioGroup,
   TextField,
 } from "@/components/molecules";
-import { hobbies, jobs, LabelValue } from "@/data";
+import { genders, hobbies, jobs, LabelValue } from "@/data";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useForm } from "@tanstack/react-form";
 import { FC, useRef, useState } from "react";
@@ -17,7 +17,6 @@ import {
   Keyboard,
   ScrollView,
   StyleSheet,
-  Text,
   TextInput,
   TouchableOpacity,
   View,
@@ -31,54 +30,31 @@ const educationItemSchema = z.object({
   yearRange: z.string().min(5, "Tahun Pendidikan harus diisi"),
 });
 
+const labelValueItem = {
+  label: z.string(),
+  value: z.string(),
+};
+
 const formSchema = z.object({
-  name: z.string().min(1, "Nama harus diisi").min(5, "Nama minimal 5 karakter"),
-  birthDate: z.object(
-    {
-      label: z.string(),
-      value: z.date().max(new Date(), "Tanggal Lahir harus di bawah hari ini"),
-    },
-    { error: "Tanggal Lahir harus diisi" }
-  ),
+  name: z.string("Nama harus diisi").min(5, "Nama minimal 5 karakter"),
+  birthDate: z
+    .date("Tanggal lahir harus diisi")
+    .max(new Date(), "Tanggal Lahir harus di bawah hari ini"),
   email: z.email("Format email salah").min(1, "Email harus diisi"),
   gender: z.enum(["male", "female"], "Jenis Kelamin harus diisi"),
-  educations: z
-    .array(educationItemSchema)
-    .min(1, "Riwayat Pendidikan harus diisi"),
-  job: z.object(
-    {
-      label: z.string(),
-      value: z.string(),
-    },
-    { error: "Pekerjaan harus diisi" }
-  ),
-  hobby: z
-    .object({
-      label: z.string(),
-      value: z.string(),
-    })
-    .optional(),
+  educations: z.array(educationItemSchema, "Riwayat Pendidikan harus diisi"),
+  job: z.object(labelValueItem, { error: "Pekerjaan harus diisi" }),
+  hobby: z.object(labelValueItem).optional(),
   subHobby: z
-    .object(
-      {
-        label: z.string(),
-        value: z.string(),
-      },
-      { error: "Sub Hobi harus diisi" }
-    )
+    .object(labelValueItem, { error: "Sub Hobi harus diisi" })
     .optional(),
 });
-// .refine((values) => {
-//   if (values.hobby && !values.subHobby) {
-//     val
-//   }
-// });
 
 type FormValues = z.infer<typeof formSchema>;
 
 const defaultValues: FormValues = {
   name: "",
-  email: "andi@rubin.com",
+  email: "",
   gender: undefined as any,
   birthDate: undefined as any,
   educations: [
@@ -88,7 +64,7 @@ const defaultValues: FormValues = {
       yearRange: "",
     },
   ],
-  job: jobs[0],
+  job: undefined as any,
   hobby: undefined as any,
   subHobby: undefined as any,
 };
@@ -141,6 +117,11 @@ const TanstackFormScreen: FC = () => {
     subHobbyPickerRef.current?.open();
   };
 
+  const onReset = () => {
+    setIsSafeEmail(false);
+    form.reset(defaultValues);
+  };
+
   return (
     <ScrollView
       contentContainerStyle={[styles.root, { paddingBottom: insets.bottom }]}
@@ -177,12 +158,9 @@ const TanstackFormScreen: FC = () => {
           },
           handleChange,
         }) => (
-          <RadioGroup
+          <RadioGroup<z.infer<typeof formSchema.shape.gender>>
             label="Jenis Kelamin"
-            data={[
-              { label: "Laki-laki", value: "male" },
-              { label: "Perempuan", value: "female" },
-            ]}
+            data={genders}
             onChange={handleChange}
             value={value}
             status={errors.length ? "error" : undefined}
@@ -198,7 +176,13 @@ const TanstackFormScreen: FC = () => {
           onChange: formSchema.shape.email,
           onBlurAsync: async ({ value, fieldApi }) => {
             const formApi = fieldApi.form;
-            if (!value || (formApi.state.isSubmitting && !isSafeEmail)) return;
+            if (
+              !value ||
+              isSafeEmail ||
+              formApi.state.isSubmitting ||
+              !formApi.getFieldMeta("email")?.isValid
+            )
+              return;
 
             await new Promise((r) => setTimeout(r, 1500));
 
@@ -500,33 +484,54 @@ const TanstackFormScreen: FC = () => {
                 style={{ borderWidth: 0.3, borderColor: "black", marginTop: 6 }}
               />
             )}
-            ListHeaderComponent={<Text>Riwayat Pendidikan</Text>}
+            ListHeaderComponent={<Text text="Riwayat Pendidikan" size={14} />}
             ListFooterComponentStyle={{
               justifyContent: "flex-end",
               alignItems: "flex-end",
             }}
             ListFooterComponent={
-              <Button
-                onPress={() =>
-                  field.pushValue({ school: "", degree: "", yearRange: "" })
-                }
-                title="Tambah Pendidikan"
-                preset="text"
-              />
+              <View>
+                <Button
+                  onPress={() =>
+                    field.pushValue({ school: "", degree: "", yearRange: "" })
+                  }
+                  title="Tambah Pendidikan"
+                  preset="text"
+                />
+                {field.state.meta.errors.length > 0 &&
+                  field.state.value.length < 1 && (
+                    <Text
+                      text={field.state.meta.errors[0]?.message}
+                      color="red"
+                      size={10}
+                    />
+                  )}
+              </View>
             }
           />
         )}
       </Field>
 
       <Button onPress={form.handleSubmit} title="Submit" />
-      <Button
-        onPress={() => {
-          setIsSafeEmail(false);
-          form.reset(defaultValues);
+      <Subscribe selector={(state) => [state.values]}>
+        {([values]) => {
+          const isHaveValues = Object.values(values).some((val) => {
+            if (Array.isArray(val)) return val.length;
+
+            if (typeof val === "object" && !(val instanceof Date)) {
+              return Object.values(val).some((sub) => !!sub);
+            }
+
+            return !!val;
+          });
+
+          return (
+            isHaveValues && (
+              <Button onPress={onReset} preset="text" title="Reset" />
+            )
+          );
         }}
-        preset="text"
-        title="Reset"
-      />
+      </Subscribe>
     </ScrollView>
   );
 };
