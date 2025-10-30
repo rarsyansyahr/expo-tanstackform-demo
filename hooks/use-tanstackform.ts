@@ -1,26 +1,20 @@
 import { DatePickerRef, ListPickerRef } from "@/components/molecules";
-import { hobbies, LabelValue } from "@/data";
+import { hobbies, LabelValue, tanstackFormDefaultValues } from "@/data";
 import { tanstackFormSchema, TanstackFormValues } from "@/schemas";
 import { useForm } from "@tanstack/react-form";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Alert, Keyboard, TextInput } from "react-native";
 
-const defaultValues: TanstackFormValues = {
-  name: "",
-  email: "",
-  gender: undefined as any,
-  birthDate: undefined as any,
-  educations: [
-    {
-      school: "",
-      degree: "",
-      yearRange: "",
-    },
-  ],
-  job: undefined as any,
-  hobby: undefined as any,
-  subHobby: undefined as any,
-};
+export const checkHaveValues = (values: TanstackFormValues) =>
+  Object.values(values).some((val) => {
+    if (Array.isArray(val)) return val.length > 1;
+
+    if (typeof val === "object" && !(val instanceof Date)) {
+      return Object.values(val).some((sub) => !!sub);
+    }
+
+    return !!val;
+  });
 
 export const useTanstackForm = () => {
   const emailRef = useRef<TextInput>(null);
@@ -34,7 +28,7 @@ export const useTanstackForm = () => {
 
   // @ts-ignore
   const form = useForm<TanstackFormValues>({
-    defaultValues,
+    defaultValues: tanstackFormDefaultValues,
     onSubmitInvalid: ({ value, formApi }) => {
       const { hobby, subHobby } = value;
 
@@ -95,19 +89,8 @@ export const useTanstackForm = () => {
 
   const onReset = useCallback(() => {
     setIsSafeEmail(false);
-    form.reset(defaultValues);
+    form.reset(tanstackFormDefaultValues);
   }, [form]);
-
-  const checkHaveValues = (values: TanstackFormValues) =>
-    Object.values(values).some((val) => {
-      if (Array.isArray(val)) return val.length > 1;
-
-      if (typeof val === "object" && !(val instanceof Date)) {
-        return Object.values(val).some((sub) => !!sub);
-      }
-
-      return !!val;
-    });
 
   useEffect(() => {
     return () => {
@@ -133,8 +116,7 @@ export const useTanstackForm = () => {
     onReset,
     onEmailBlur,
     onBirthDateChange,
-    checkHaveValues,
   };
 
-  return { ...refs, ...states, ...actions, form, defaultValues };
+  return { ...refs, ...states, ...actions, form };
 };
