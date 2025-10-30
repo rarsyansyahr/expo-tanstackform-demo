@@ -27,3 +27,8 @@ export const hobbies: LabelValueItem[] = [
     ],
   },
 ];
+
+export const genders: { label: string; value: "male" | "female" }[] = [
+  { label: "Laki-laki", value: "male" },
+  { label: "Perempuan", value: "female" },
+];
