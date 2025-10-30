@@ -1,6 +1,6 @@
 import { Alert, StyleSheet, View, ViewStyle } from "react-native";
 
-import { ListPicker, TextField } from "@/components/molecules";
+import { ListPicker, ListPickerItem, TextField } from "@/components/molecules";
 import { hobbies, jobs, LabelValue } from "@/data";
 import { Button, Host } from "@expo/ui/swift-ui";
 import { useCallback, useMemo, useState } from "react";
@@ -83,6 +83,16 @@ export default function HomeScreen() {
     [errorValidation.email]
   );
 
+  const onHobbyChange = useCallback((value: ListPickerItem) => {
+    setSubHobbyLoading(true);
+    setHobby(value);
+    setSubHobby(undefined);
+    setErrorValidation((prev) => ({ ...prev, hobby: undefined }));
+    setTimeout(() => {
+      setSubHobbyLoading(false);
+    }, 1000);
+  }, []);
+
   const isCanSubmit = useMemo(
     () => job && hobby && subHobby && name && email && !subHobbyLoading,
     [job, hobby, subHobby, subHobbyLoading, name, email]
@@ -112,7 +122,7 @@ export default function HomeScreen() {
       setErrorValidation((prev) => ({ ...prev, hobby: "Hobi harus diisi" }));
     }
 
-    if (!subHobby) {
+    if (hobby && !subHobby) {
       setErrorValidation((prev) => ({
         ...prev,
         subHobby: "Sub Hobi harus diisi",
@@ -128,7 +138,7 @@ export default function HomeScreen() {
         placeholder="Masukan Nama"
         value={name}
         status={errorValidation.name ? "error" : undefined}
-        helper={errorValidation.name || undefined}
+        helper={errorValidation.name}
       />
       <TextField
         onChange={onEmailChange}
@@ -138,7 +148,7 @@ export default function HomeScreen() {
         keyboardType="email-address"
         inputMode="email"
         status={errorValidation.email ? "error" : undefined}
-        helper={errorValidation.email || undefined}
+        helper={errorValidation.email}
       />
       <ListPicker
         data={jobs}
@@ -147,23 +157,16 @@ export default function HomeScreen() {
         label="Pekerjaan"
         placeholder="Pilih Pekerjaan"
         status={errorValidation.job ? "error" : undefined}
-        helper={errorValidation.job || undefined}
+        helper={errorValidation.job}
       />
       <ListPicker
         data={hobbies}
         value={hobby}
-        onChange={(value) => {
-          setSubHobbyLoading(true);
-          setHobby(value);
-          setSubHobby(undefined);
-          setTimeout(() => {
-            setSubHobbyLoading(false);
-          }, 1000);
-        }}
+        onChange={onHobbyChange}
         label="Hobi"
         placeholder="Pilih Hobi"
         status={errorValidation.hobby ? "error" : undefined}
-        helper={errorValidation.hobby || undefined}
+        helper={errorValidation.hobby}
       />
       <ListPicker
         data={subHobbies}
@@ -174,7 +177,7 @@ export default function HomeScreen() {
         disabled={!hobby}
         loading={subHobbyLoading}
         status={errorValidation.subHobby ? "error" : undefined}
-        helper={errorValidation.subHobby || undefined}
+        helper={errorValidation.subHobby}
       />
       <Host matchContents>
         <Button variant="borderedProminent" onPress={onSubmit}>
