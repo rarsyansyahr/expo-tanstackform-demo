@@ -2,18 +2,18 @@ import { Drawer } from "expo-router/drawer";
 
 const menus = [
   { name: "index", title: "Basic" },
-  { name: "tanstackform", title: "Tanstack Form" },
+  { name: "tanstackForm", title: "Tanstack Form" },
   { name: "formComposition", title: "Form Composition" },
 ];
 
 export default function Layout() {
   return (
     <Drawer>
-      {menus.map((item, index) => (
+      {menus.map(({ name, title }) => (
         <Drawer.Screen
-          key={index}
-          name={item.name}
-          options={{ drawerLabel: item.title, title: item.title }}
+          key={name}
+          name={name}
+          options={{ drawerLabel: title, title }}
         />
       ))}
     </Drawer>
