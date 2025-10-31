@@ -264,7 +264,7 @@ const JobForm = withForm({
 });
 
 const OtherForm = withForm({
-  defaultValues: tanstackFormDefaultValues,
+  ...tanstackFormOptions,
   props: {
     title: "Other Form",
   },
@@ -310,7 +310,7 @@ const OtherForm = withForm({
 });
 
 const EducationForm = withForm({
-  defaultValues: tanstackFormDefaultValues,
+...tanstackFormOptions,
   props: {
     title: "Education Form",
   },
@@ -428,8 +428,10 @@ const EducationForm = withForm({
 const FormCompositionScreen: FC = () => {
   const insets = useSafeAreaInsets();
 
+  const $rootStyle = [styles.root, { paddingBottom: insets.bottom }];
+
   const form = useAppForm({
-    defaultValues: tanstackFormDefaultValues,
+    ...tanstackFormOptions,
     onSubmitInvalid: ({ value, formApi }) => {
       const { hobby, subHobby } = value;
 
@@ -466,14 +468,10 @@ const FormCompositionScreen: FC = () => {
   );
 
   return (
-    <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
+    <KeyboardAvoidingView behavior="padding" style={styles.flex}>
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{
-          gap: 16,
-          padding: 16,
-          paddingBottom: insets.bottom,
-        }}
+        contentContainerStyle={$rootStyle}
       >
         <PersonalForm form={form} title="Pribadi" />
         <JobForm form={form} title="Pekerjaan" />

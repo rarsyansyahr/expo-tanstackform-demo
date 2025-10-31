@@ -354,7 +354,7 @@ const TanstackFormScreen: FC = () => {
                     </View>
                   </View>
                   <TouchableOpacity
-                    style={{ alignItems: "center", justifyContent: "center" }}
+                    style={styles.removeButton}
                     activeOpacity={0.8}
                     onPress={() =>
                       field.state.value.length > 1 && field.removeValue(index)
@@ -364,16 +364,13 @@ const TanstackFormScreen: FC = () => {
                   </TouchableOpacity>
                 </View>
               )}
-              contentContainerStyle={{ gap: 6 }}
+              contentContainerStyle={styles.educationList}
               removeClippedSubviews
               showsVerticalScrollIndicator={false}
               scrollEnabled={false}
               ItemSeparatorComponent={() => <View style={styles.separator} />}
               ListHeaderComponent={<Text text="Riwayat Pendidikan" size={14} />}
-              ListFooterComponentStyle={{
-                justifyContent: "flex-end",
-                alignItems: "flex-end",
-              }}
+              ListFooterComponentStyle={styles.educationListFooter}
               ListFooterComponent={
                 <View>
                   <Button
@@ -397,7 +394,10 @@ const TanstackFormScreen: FC = () => {
           )}
         </Field>
 
+        {/* Submit */}
         <Button onPress={form.handleSubmit} title="Submit" />
+        
+        {/* Reset */}
         <Subscribe selector={(state) => [state.values]}>
           {([values]) =>
             checkHaveValues(values) && (
@@ -443,4 +443,13 @@ const styles = StyleSheet.create({
     borderColor: "black",
     marginTop: 6,
   },
+
+  removeButton: { alignItems: "center", justifyContent: "center" },
+
+  educationListFooter: {
+    justifyContent: "flex-end",
+    alignItems: "flex-end",
+  },
+
+  educationList: { gap: 6 },
 });

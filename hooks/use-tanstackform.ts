@@ -1,5 +1,5 @@
 import { DatePickerRef, ListPickerRef } from "@/components/molecules";
-import { hobbies, LabelValue, tanstackFormDefaultValues } from "@/data";
+import { hobbies, LabelValue, registeredEmail, tanstackFormDefaultValues } from "@/data";
 import { tanstackFormSchema, TanstackFormValues } from "@/schemas";
 import { useForm } from "@tanstack/react-form";
 import { router } from "expo-router";
@@ -85,7 +85,7 @@ export const useTanstackForm = () => {
 
     await new Promise((r) => setTimeout(r, 1500));
 
-    const isDuplicated = value.toLowerCase() === "andi@rubin.com";
+    const isDuplicated = value.toLowerCase() === registeredEmail;
 
     if (!isSafeEmail) setIsSafeEmail(!isDuplicated);
 

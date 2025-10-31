@@ -74,3 +74,5 @@ export const tanstackFormDefaultValues: TanstackFormValues = {
   ...otherDefaultValues,
   ...educationDefaultValues,
 };
+
+export const registeredEmail = "andi@rubin.com";
