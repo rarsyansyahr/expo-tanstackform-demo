@@ -211,7 +211,7 @@ const TanstackFormScreen: FC = () => {
               ref={hobbyPickerRef}
               label="Hobi"
               placeholder="Pilih Hobi"
-              data={hobbies}
+              data={hobbies.map(({ items, ...rest }) => rest)}
               value={value}
               onChange={handleChange}
               status={errors.length ? "error" : undefined}
@@ -396,7 +396,7 @@ const TanstackFormScreen: FC = () => {
 
         {/* Submit */}
         <Button onPress={form.handleSubmit} title="Submit" />
-        
+
         {/* Reset */}
         <Subscribe selector={(state) => [state.values]}>
           {([values]) =>

@@ -27,6 +27,13 @@ export default function RootLayout() {
           <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen
+            name="result"
+            options={{
+              headerBackButtonDisplayMode: "minimal",
+              title: "Result",
+            }}
+          />
+          <Stack.Screen
             name="modal"
             options={{ presentation: "modal", title: "Modal" }}
           />

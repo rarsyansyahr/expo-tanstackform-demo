@@ -1,5 +1,10 @@
 import { DatePickerRef, ListPickerRef } from "@/components/molecules";
-import { hobbies, LabelValue, registeredEmail, tanstackFormDefaultValues } from "@/data";
+import {
+  hobbies,
+  LabelValue,
+  registeredEmail,
+  tanstackFormDefaultValues,
+} from "@/data";
 import { tanstackFormSchema, TanstackFormValues } from "@/schemas";
 import { useForm } from "@tanstack/react-form";
 import { router } from "expo-router";
@@ -43,12 +48,12 @@ export const useTanstackForm = () => {
       // @ts-ignore
       if (hobby && !subHobby) return form.setFieldValue("subHobby", null);
 
+      Keyboard.dismiss();
+
       router.push({
         pathname: "/result",
         params: { request: JSON.stringify(value) },
       });
-
-      Keyboard.dismiss();
     },
   });
 

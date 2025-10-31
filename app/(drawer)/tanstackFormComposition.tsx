@@ -24,9 +24,9 @@ import {
   createFormHookContexts,
   formOptions,
 } from "@tanstack/react-form";
+import { router } from "expo-router";
 import React, { FC, useCallback } from "react";
 import {
-  Alert,
   FlatList,
   Keyboard,
   KeyboardAvoidingView,
@@ -280,7 +280,7 @@ const OtherForm = withForm({
             <field.ListPicker
               label="Hobi"
               placeholder="Pilih Hobi"
-              data={hobbies}
+              data={hobbies.map(({ items, ...rest }) => rest)}
             />
           )}
         </form.AppField>
@@ -310,7 +310,7 @@ const OtherForm = withForm({
 });
 
 const EducationForm = withForm({
-...tanstackFormOptions,
+  ...tanstackFormOptions,
   props: {
     title: "Education Form",
   },
@@ -446,9 +446,12 @@ const FormCompositionScreen: FC = () => {
       // @ts-ignore
       if (hobby && !subHobby) return formApi.setFieldValue("subHobby", null);
 
-      Alert.alert("Values", JSON.stringify(value));
-
       Keyboard.dismiss();
+
+      router.push({
+        pathname: "/result",
+        params: { request: JSON.stringify(value) },
+      });
     },
   });
 
