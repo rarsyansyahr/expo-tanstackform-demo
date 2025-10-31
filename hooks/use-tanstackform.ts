@@ -2,8 +2,9 @@ import { DatePickerRef, ListPickerRef } from "@/components/molecules";
 import { hobbies, LabelValue, tanstackFormDefaultValues } from "@/data";
 import { tanstackFormSchema, TanstackFormValues } from "@/schemas";
 import { useForm } from "@tanstack/react-form";
+import { router } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Alert, Keyboard, TextInput } from "react-native";
+import { Keyboard, TextInput } from "react-native";
 
 export const checkHaveValues = (values: TanstackFormValues) =>
   Object.values(values).some((val) => {
@@ -42,7 +43,10 @@ export const useTanstackForm = () => {
       // @ts-ignore
       if (hobby && !subHobby) return form.setFieldValue("subHobby", null);
 
-      Alert.alert("Values", JSON.stringify(value));
+      router.push({
+        pathname: "/result",
+        params: { request: JSON.stringify(value) },
+      });
 
       Keyboard.dismiss();
     },

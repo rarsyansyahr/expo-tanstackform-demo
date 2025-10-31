@@ -23,8 +23,8 @@ export const hobbies: LabelValueItem[] = [
     label: "Membaca",
     value: "membaca",
     items: [
-      { label: "Novel", value: "Novel" },
-      { label: "Komik", value: "Komik" },
+      { label: "Novel", value: "novel" },
+      { label: "Komik", value: "komik" },
     ],
   },
   {

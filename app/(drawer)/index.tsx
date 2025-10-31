@@ -1,8 +1,9 @@
-import { Alert, StyleSheet, View, ViewStyle } from "react-native";
+import { StyleSheet, View, ViewStyle } from "react-native";
 
 import { ListPicker, ListPickerItem, TextField } from "@/components/molecules";
 import { hobbies, jobs, LabelValue } from "@/data";
 import { Button, Host } from "@expo/ui/swift-ui";
+import { router } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -93,6 +94,16 @@ export default function HomeScreen() {
     }, 1000);
   }, []);
 
+  const onSubHobbyChange = useCallback((value: ListPickerItem) => {
+    setSubHobby(value);
+    setErrorValidation((prev) => ({ ...prev, subHobby: undefined }));
+  }, []);
+
+  const onJobChange = useCallback((value: ListPickerItem) => {
+    setJob(value);
+    setErrorValidation((prev) => ({ ...prev, job: undefined }));
+  }, []);
+
   const isCanSubmit = useMemo(
     () => job && hobby && subHobby && name && email && !subHobbyLoading,
     [job, hobby, subHobby, subHobbyLoading, name, email]
@@ -100,10 +111,12 @@ export default function HomeScreen() {
 
   const onSubmit = useCallback(() => {
     if (isCanSubmit) {
-      return Alert.alert(
-        "Values",
-        JSON.stringify({ name, email, job, hobby, subHobby })
-      );
+      return router.push({
+        pathname: "/result",
+        params: {
+          request: JSON.stringify({ name, email, job, hobby, subHobby }),
+        },
+      });
     }
 
     if (!name) {
@@ -153,7 +166,7 @@ export default function HomeScreen() {
       <ListPicker
         data={jobs}
         value={job}
-        onChange={setJob}
+        onChange={onJobChange}
         label="Pekerjaan"
         placeholder="Pilih Pekerjaan"
         status={errorValidation.job ? "error" : undefined}
@@ -171,7 +184,7 @@ export default function HomeScreen() {
       <ListPicker
         data={subHobbies}
         value={subHobby}
-        onChange={setSubHobby}
+        onChange={onSubHobbyChange}
         label="Sub Hobi"
         placeholder="Pilih Sub Hobi"
         disabled={!hobby}
