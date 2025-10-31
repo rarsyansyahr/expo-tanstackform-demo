@@ -60,8 +60,6 @@ const TanstackFormScreen: FC = () => {
               onChange={handleChange}
               status={errors.length ? "error" : undefined}
               helper={errors[0]?.message}
-              returnKeyType="next"
-              // onSubmitEditing={() => emailRef.current?.focus()}
             />
           )}
         </Field>
@@ -81,7 +79,10 @@ const TanstackFormScreen: FC = () => {
             <RadioGroup<Gender>
               label="Jenis Kelamin"
               data={genders}
-              onChange={handleChange}
+              onChange={(val) => {
+                handleChange(val);
+                emailRef.current?.focus();
+              }}
               value={value}
               status={errors.length ? "error" : undefined}
               helper={errors[0]?.message}

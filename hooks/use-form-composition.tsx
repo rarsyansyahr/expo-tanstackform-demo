@@ -1,9 +1,9 @@
 import { FormAction, FormField } from "@/components/pages/formComposition";
 import { tanstackFormDefaultValues } from "@/data";
 import {
-    createFormHook,
-    createFormHookContexts,
-    formOptions,
+  createFormHook,
+  createFormHookContexts,
+  formOptions,
 } from "@tanstack/react-form";
 import { useCallback } from "react";
 import { Alert, Keyboard } from "react-native";
