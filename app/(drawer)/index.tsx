@@ -2,13 +2,14 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   StyleSheet,
+  View,
   ViewStyle,
 } from "react-native";
 
+import { Button } from "@/components/atoms";
 import { ListPicker, TextField } from "@/components/molecules";
 import { hobbies, jobs } from "@/data";
 import { useManualForm } from "@/hooks";
-import { Button, Host } from "@expo/ui/swift-ui";
 import { FC } from "react";
 
 const HomeScreen: FC = () => {
@@ -16,7 +17,7 @@ const HomeScreen: FC = () => {
   const { name, email, job, hobby, subHobby } = manualFormHook;
   const { errorValidation, subHobbies, subHobbyLoading } = manualFormHook;
   const { onNameChange, onEmailChange, onHobbyChange } = manualFormHook;
-  const { onJobChange, onSubHobbyChange, onSubmit } = manualFormHook;
+  const { onJobChange, onSubHobbyChange, onSubmit, reset } = manualFormHook;
 
   return (
     <KeyboardAvoidingView style={styles.flex} behavior="padding">
@@ -71,11 +72,10 @@ const HomeScreen: FC = () => {
           status={errorValidation.subHobby ? "error" : undefined}
           helper={errorValidation.subHobby}
         />
-        <Host matchContents>
-          <Button variant="borderedProminent" onPress={onSubmit}>
-            Submit
-          </Button>
-        </Host>
+        <View style={{ flexDirection: "row" }}>
+            <Button title="Submit" onPress={onSubmit} />
+            <Button title="Reset" preset="text" onPress={reset} />
+        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );

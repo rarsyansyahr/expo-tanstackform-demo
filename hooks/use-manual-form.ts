@@ -35,7 +35,7 @@ export const useManualForm = () => {
     () =>
       hobbies.find(({ items, ...rest }) => rest.value === hobby?.value)
         ?.items || [],
-    [hobby],
+    [hobby]
   );
 
   const onNameChange = useCallback(
@@ -59,7 +59,7 @@ export const useManualForm = () => {
         setErrorValidation((prev) => ({ ...prev, name: undefined }));
       }
     },
-    [errorValidation.name],
+    [errorValidation.name]
   );
 
   const onEmailChange = useCallback(
@@ -83,7 +83,7 @@ export const useManualForm = () => {
         setErrorValidation((prev) => ({ ...prev, email: undefined }));
       }
     },
-    [errorValidation.email],
+    [errorValidation.email]
   );
 
   const onHobbyChange = useCallback((value: ListPickerItem) => {
@@ -108,7 +108,7 @@ export const useManualForm = () => {
 
   const isCanSubmit = useMemo(
     () => job && hobby && subHobby && name && email && !subHobbyLoading,
-    [job, hobby, subHobby, subHobbyLoading, name, email],
+    [job, hobby, subHobby, subHobbyLoading, name, email]
   );
 
   const onSubmit = useCallback(() => {
@@ -145,16 +145,18 @@ export const useManualForm = () => {
     }
   }, [isCanSubmit, name, email, job, hobby, subHobby]);
 
+  const reset = useCallback(() => {
+    setJob(undefined);
+    setHobby(undefined);
+    setSubHobby(undefined);
+    setSubHobbyLoading(false);
+    setName("");
+    setEmail("");
+    setErrorValidation(defaultErrorValidationValues);
+  }, []);
+
   useEffect(() => {
-    return () => {
-      setJob(undefined);
-      setHobby(undefined);
-      setSubHobby(undefined);
-      setSubHobbyLoading(false);
-      setName("");
-      setEmail("");
-      setErrorValidation(defaultErrorValidationValues);
-    };
+    return reset;
   }, []);
 
   return {
@@ -172,5 +174,6 @@ export const useManualForm = () => {
     onSubHobbyChange,
     subHobbyLoading,
     onSubmit,
+    reset,
   };
 };
